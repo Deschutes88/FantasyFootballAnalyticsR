@@ -13,7 +13,9 @@ library("XML")
 library("stringr")
 library("ggplot2")
 library("plyr")
-
+library("ORCH")
+ore.connect(type="HIVE") 
+ore.attach()
 #Functions
 source(paste(getwd(),"/R Scripts/Functions/Functions.R", sep=""))
 source(paste(getwd(),"/R Scripts/Functions/League Settings.R", sep=""))
@@ -121,9 +123,31 @@ ggplot(projections_accu, aes(x=pts_accu)) + geom_density(fill="blue", alpha=.3) 
 ggsave(paste(getwd(),"/Figures/Accuscore projections.jpg", sep=""), width=10, height=10)
 dev.off()
 
+#Required to make new Aprojections_accu Hive table.
+ore.create(data, table="Aprojections_accu")
+#Once a new Hive table is generated you need to use sysnc to move data to it and will no longer need to use the above statement.
+#ore.sync(table="Aprojections_accu") 
+
 #Save file
 save(projections_accu, file = paste(getwd(), "/Data/Accuscore-Projections.RData", sep=""))
-write.csv(projections_accu, file=paste(getwd(), "/Data/Accuscore-Projections.csv", sep=""), row.names=FALSE)
+
+#Use to write data to .csv instead
+#write.csv(projections_accu, file=paste(getwd(), "/Data/Accuscore-Projections.csv", sep=""), row.names=FALSE)
+
+#Feed data to Hive table.
+projections_accu = ore.push(projections_accu)
+
+
+#Required to make new Aprojections_accu Hive table.
+ore.create(data, table="p.rojections_accu")
+#Once a new Hive table is generated you need to use sysnc to move data to it and will no longer need to use the above statement.
+#ore.sync(table="p.rojections_accu") 
 
 save(projections_accu, file = paste(getwd(), "/Data/Historical Projections/Accuscore-Projections-", season, ".RData", sep=""))
-write.csv(projections_accu, file=paste(getwd(), "/Data/Historical Projections/Accuscore-Projections-", season, ".csv", sep=""), row.names=FALSE)
+
+#Use to write data to .csv instead
+#write.csv(p.rojections_accu, file=paste(getwd(), "/Data/Historical Projections/Accuscore-Projections-", season, ".csv", sep=""), row.names=FALSE)
+
+#Feed data to Hive table.
+projections_accu = ore.push(p.rojections_accu)
+
