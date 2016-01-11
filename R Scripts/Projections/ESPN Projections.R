@@ -152,7 +152,7 @@ ggsave(paste(getwd(),"/Figures/ESPN projections.jpg", sep=""), width=10, height=
 dev.off()
 
 #Required to make new Aprojections_accu Hive table.
-ore.create(data, table="projections_espn")
+ore.create(projections_espn, table="projections_espn")
 
 #Save file
 save(projections_espn, file = paste(getwd(), "/Data/ESPN-Projections.RData", sep=""))
