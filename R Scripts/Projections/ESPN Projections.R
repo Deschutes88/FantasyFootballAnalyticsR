@@ -14,6 +14,10 @@ library("ggplot2")
 library("plyr")
 library("data.table")
 
+library("ORCH")
+ore.connect(type="HIVE") 
+ore.attach()
+
 #Functions
 source(paste(getwd(),"/R Scripts/Functions/Functions.R", sep=""))
 source(paste(getwd(),"/R Scripts/Functions/League Settings.R", sep=""))
@@ -147,9 +151,15 @@ ggplot(projections_espn, aes(x=points)) + geom_density(fill="blue", alpha=.3) + 
 ggsave(paste(getwd(),"/Figures/ESPN projections.jpg", sep=""), width=10, height=10)
 dev.off()
 
+#Required to make new Aprojections_accu Hive table.
+ore.create(data, table="projections_espn")
+
 #Save file
 save(projections_espn, file = paste(getwd(), "/Data/ESPN-Projections.RData", sep=""))
-write.csv(projections_espn, file=paste(getwd(), "/Data/ESPN-Projections.csv", sep=""), row.names=FALSE)
+#write.csv(projections_espn, file=paste(getwd(), "/Data/ESPN-Projections.csv", sep=""), row.names=FALSE)
+#Feed data to Hive table.
+projections_espn = ore.push(projections_espn)
+
 
 save(projections_espn, file = paste(getwd(), "/Data/Historical Projections/ESPN-Projections-", season, ".RData", sep=""))
-write.csv(projections_espn, file=paste(getwd(), "/Data/Historical Projections/ESPN-Projections-", season, ".csv", sep=""), row.names=FALSE)
+#write.csv(projections_espn, file=paste(getwd(), "/Data/Historical Projections/ESPN-Projections-", season, ".csv", sep=""), row.names=FALSE)
