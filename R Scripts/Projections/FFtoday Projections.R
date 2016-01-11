@@ -12,7 +12,9 @@ library("XML")
 library("stringr")
 library("ggplot2")
 library("plyr")
-
+library("ORCH")
+ore.connect(type="HIVE") 
+ore.attach()
 #Functions
 source(paste(getwd(),"/R Scripts/Functions/Functions.R", sep=""))
 source(paste(getwd(),"/R Scripts/Functions/League Settings.R", sep=""))
@@ -108,10 +110,13 @@ row.names(projections_fftoday) <- 1:dim(projections_fftoday)[1]
 ggplot(projections_fftoday, aes(x=pts_fftoday)) + geom_density(fill="blue", alpha=.3) + xlab("Player's Projected Points") + ggtitle("Density Plot of FFtoday Projected Points")
 ggsave(paste(getwd(),"/Figures/FFtoday projections.jpg", sep=""), width=10, height=10)
 dev.off()
-
+#Required to make new Aprojections_accu Hive table.
+ore.create(projections_fftoday, table="projections_fftoday")
 #Save file
 save(projections_fftoday, file = paste(getwd(), "/Data/FFtoday-Projections.RData", sep=""))
-write.csv(projections_fftoday, file=paste(getwd(), "/Data/FFtoday-Projections.csv", sep=""), row.names=FALSE)
+#write.csv(projections_fftoday, file=paste(getwd(), "/Data/FFtoday-Projections.csv", sep=""), row.names=FALSE)
+#Feed data to Hive table.
+projections_fftoday = ore.push(projections_fftoday)
 
 save(projections_fftoday, file = paste(getwd(), "/Data/Historical Projections/FFtoday-Projections-", season, ".RData", sep=""))
-write.csv(projections_fftoday, file=paste(getwd(), "/Data/Historical Projections/FFtoday-Projections-", season, ".csv", sep=""), row.names=FALSE)
+#write.csv(projections_fftoday, file=paste(getwd(), "/Data/Historical Projections/FFtoday-Projections-", season, ".csv", sep=""), row.names=FALSE)
