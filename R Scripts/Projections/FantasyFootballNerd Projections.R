@@ -12,7 +12,9 @@ library("XML")
 library("stringr")
 library("ggplot2")
 library("plyr")
-
+library("ORCH")
+ore.connect(type="HIVE") 
+ore.attach()
 #Functions
 source(paste(getwd(),"/R Scripts/Functions/Functions.R", sep=""))
 source(paste(getwd(),"/R Scripts/Functions/League Settings.R", sep=""))
@@ -100,10 +102,14 @@ row.names(projections_ffn) <- 1:dim(projections_ffn)[1]
 ggplot(projections_ffn, aes(x=pts_ffn)) + geom_density(fill="orange", alpha=.3) + xlab("Player's Projected Points") + ggtitle("Density Plot of FantasyFootballNerd Projected Points")
 ggsave(paste(getwd(),"/Figures/FantasyFootballNerd projections.jpg", sep=""), width=10, height=10)
 dev.off()
+#Required to make new Aprojections_accu Hive table.
+ore.create(projections_ffn, table="projections_ffn")
 
 #Save file
 save(projections_ffn, file = paste(getwd(), "/Data/FantasyFootballNerd-Projections.RData", sep=""))
-write.csv(projections_ffn, file=paste(getwd(), "/Data/FantasyFootballNerd-Projections.csv", sep=""), row.names=FALSE)
+#write.csv(projections_ffn, file=paste(getwd(), "/Data/FantasyFootballNerd-Projections.csv", sep=""), row.names=FALSE)
+#Feed data to Hive table.
+projections_ffn = ore.push(projections_ffn)
 
 save(projections_ffn, file = paste(getwd(), "/Data/Historical Projections/FantasyFootballNerd-Projections-", season, ".RData", sep=""))
-write.csv(projections_ffn, file=paste(getwd(), "/Data/Historical Projections/FantasyFootballNerd-Projections-", season, ".csv", sep=""), row.names=FALSE)
+#write.csv(projections_ffn, file=paste(getwd(), "/Data/Historical Projections/FantasyFootballNerd-Projections-", season, ".csv", sep=""), row.names=FALSE)
