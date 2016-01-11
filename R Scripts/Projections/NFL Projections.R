@@ -12,6 +12,9 @@ library("XML")
 library("stringr")
 library("ggplot2")
 library("plyr")
+library("ORCH")
+ore.connect(type="HIVE") 
+ore.attach()
 
 #Suffix
 suffix <- "nfl"
@@ -119,9 +122,15 @@ ggplot(projections_nfl, aes(x=pts_nfl), fill=pos) + geom_density(fill="green", a
 ggsave(paste(getwd(),"/Figures/NFL projections.jpg", sep=""), width=10, height=10)
 dev.off()
 
+#Required to make new Aprojections_accu Hive table.
+ore.create(projections_nfl, table="projections_nfl")
+
 #Save file
 save(projections_nfl, file = paste(getwd(), "/Data/NFL-Projections.RData", sep=""))
-write.csv(projections_nfl, file=paste(getwd(), "/Data/NFL-Projections.csv", sep=""), row.names=FALSE)
+#write.csv(projections_nfl, file=paste(getwd(), "/Data/NFL-Projections.csv", sep=""), row.names=FALSE)
+#Feed data to Hive table.
+projections_nfl = ore.push(projections_nfl)
+
 
 save(projections_nfl, file = paste(getwd(), "/Data/Historical Projections/NFL-Projections-", season, ".RData", sep=""))
-write.csv(projections_nfl, file=paste(getwd(), "/Data/Historical Projections/NFL-Projections-", season, ".csv", sep=""), row.names=FALSE)
+#write.csv(projections_nfl, file=paste(getwd(), "/Data/Historical Projections/NFL-Projections-", season, ".csv", sep=""), row.names=FALSE)
